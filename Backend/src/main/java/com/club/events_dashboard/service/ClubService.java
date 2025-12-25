@@ -28,7 +28,7 @@ public class ClubService {
 
     //Create Club (SuperAdmin Only)
     public ResponseEntity<ApiResponse> createClub(ClubRequestDTO clubRequest, String requesterEmail, Role requesterRole) {
-        if (requesterRole != Role.SUPERADMIN) {
+        if (requesterRole != Role.SUPER_ADMIN) {
             return ResponseEntity.status(403).body(new ApiResponse(false, "Only Super Admins can create clubs"));
         }
 
@@ -64,7 +64,7 @@ public class ClubService {
 
     // Update Club (SuperAdmin Only)
     public ResponseEntity<ApiResponse> updateClub(Long id, ClubRequestDTO clubRequest, Role requesterRole) {
-        if (requesterRole != Role.SUPERADMIN) {
+        if (requesterRole != Role.SUPER_ADMIN) {
             return ResponseEntity.status(403).body(new ApiResponse(false, "Only Super Admins can update clubs"));
         }
 
@@ -97,7 +97,7 @@ public class ClubService {
 
     // Delete club (SuperAdmin only)
     public ResponseEntity<ApiResponse> deleteClub(Long id, Role requesterRole) {
-        if (requesterRole != Role.SUPERADMIN) {
+        if (requesterRole != Role.SUPER_ADMIN) {
             return ResponseEntity.status(403).body(new ApiResponse(false, "Only Super Admins can delete clubs"));
         }
 

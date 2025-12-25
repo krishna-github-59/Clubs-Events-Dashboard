@@ -45,7 +45,7 @@ public class MediaService {
 
     // Helper Function
     private boolean canManageMedia(Long eventId, String requesterEmail, Role requesterRole) {
-        if (requesterRole == Role.SUPERADMIN) {
+        if (requesterRole == Role.SUPER_ADMIN) {
             return true;
         }
 

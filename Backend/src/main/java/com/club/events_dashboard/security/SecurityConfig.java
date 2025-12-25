@@ -32,7 +32,7 @@ public class SecurityConfig {
                         "/api/events/**",
                         "/api/clubs/**"
                     ).permitAll()
-                    // .hasAnyRole("SUPERADMIN", "CLUB_ADMIN", "STUDENT")
+                    // .hasAnyRole("SUPER_ADMIN", "CLUB_ADMIN", "STUDENT")
                     .anyRequest().authenticated()
             )
             .formLogin(form -> form.disable()) // Disable default login form

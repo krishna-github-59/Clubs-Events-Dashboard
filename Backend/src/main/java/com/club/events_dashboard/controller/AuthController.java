@@ -17,6 +17,13 @@ public class AuthController {
     @Autowired
     private AuthService authService;
     
+    // Super Admin Bootstrap Registration
+    @PostMapping("/register/super-admin")
+    public ResponseEntity<ApiResponse> registerSuperAdmin(
+            @RequestBody RegisterRequestDTO request) {
+        return authService.registerSuperAdmin(request);
+    }
+    
     // Register students
     @PostMapping("/register/student")
     public ResponseEntity<ApiResponse> register(@RequestBody RegisterRequestDTO request) {
@@ -25,7 +32,7 @@ public class AuthController {
 
     // Register club admin
     @PostMapping("/register/club-admin")
-    @PreAuthorize("hasRole('SUPERADMIN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     public ResponseEntity<ApiResponse> registerClubAdmin(@RequestBody RegisterRequestDTO request) {
         return authService.registerClubAdmin(request);
     }

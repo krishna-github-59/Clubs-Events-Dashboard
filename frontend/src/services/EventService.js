@@ -95,12 +95,12 @@ class EventService {
       },
       body: JSON.stringify({ email, password })
     });
-    const data = await response.json();
-    if (data.success && data.data?.token) {
-      localStorage.setItem('token', data.data.token);
-      localStorage.setItem('user', JSON.stringify(data.data));
+    const result = await response.json();
+    if (result.success && result.data?.token) {
+      localStorage.setItem('token', result.data.token);
+      localStorage.setItem('user', JSON.stringify(result.data));
     }
-    return data;
+    return result;
   }
 
   // Register student

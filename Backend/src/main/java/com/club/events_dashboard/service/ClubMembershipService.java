@@ -25,7 +25,7 @@ public class ClubMembershipService {
     private UserRepository userRepository;
 
     private boolean canManageMembership(Club club, String requesterEmail, Role requesterRole) {
-        return (requesterRole == Role.SUPERADMIN) || (club != null && club.getAdminEmail().equalsIgnoreCase(requesterEmail));
+        return (requesterRole == Role.SUPER_ADMIN) || (club != null && club.getAdminEmail().equalsIgnoreCase(requesterEmail));
     }
 
 
