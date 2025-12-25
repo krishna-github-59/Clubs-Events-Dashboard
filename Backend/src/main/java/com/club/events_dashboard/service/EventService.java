@@ -45,7 +45,7 @@ public class EventService {
 
     // Helper — check if requested user can manage this event
     private boolean canManageEvent(Club club, String requesterEmail, Role requesterRole) {
-        return (requesterRole == Role.SUPER_ADMIN)
+        return (requesterRole == Role.SUPERADMIN)
                 || (club != null && club.getAdminEmail().equalsIgnoreCase(requesterEmail));
     }
 

@@ -46,7 +46,7 @@ public class JwtUtil {
         if (roleString == null) {
             throw new IllegalArgumentException("Role is missing in token");
         }
-        return Role.valueOf(roleString); // converts "SUPER_ADMIN" -> Role.SUPER_ADMIN
+        return Role.valueOf(roleString); // converts "SUPERADMIN" -> Role.SUPERADMIN
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {

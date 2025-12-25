@@ -29,47 +29,6 @@ public class AuthService {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
-    // Super Admin Bootstrap Registration
-    public ResponseEntity<ApiResponse> registerSuperAdmin(RegisterRequestDTO request) {
-        // 🔒 Email domain check
-        if (!request.getEmail().endsWith("@iiitm.ac.in")) {
-            return ResponseEntity.badRequest()
-                    .body(new ApiResponse(false, "Super Admin email must be from iiitm.ac.in domain"));
-        }
-        
-        // 🔒 Bootstrap guard (only first time)
-        if (userRepository.existsByRole(Role.SUPER_ADMIN)) {
-            return ResponseEntity.status(403)
-                    .body(new ApiResponse(false, "Super Admin already exists"));
-        }
-
-        // 🔒 Email uniqueness
-        Optional<User> existingUser = userRepository.findByEmail(request.getEmail());
-        if (existingUser.isPresent()) {
-            return ResponseEntity.badRequest()
-                    .body(new ApiResponse(false, "Email already registered"));
-        }
-
-        User user = new User();
-        user.setName(request.getName());
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(Role.SUPER_ADMIN);
-
-        User savedUser = userRepository.save(user);
-
-        UserDTO userDTO = new UserDTO(
-                savedUser.getId(),
-                savedUser.getName(),
-                savedUser.getEmail()
-        );
-
-        return ResponseEntity.ok(
-                new ApiResponse(true, "Super Admin registered successfully", userDTO)
-        );
-    }
-
-
     // student
     public ResponseEntity<ApiResponse> registerStudent(RegisterRequestDTO request) {
         return register(request, Role.STUDENT);

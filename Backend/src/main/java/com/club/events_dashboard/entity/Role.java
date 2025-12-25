@@ -1,7 +1,7 @@
 package com.club.events_dashboard.entity;
 
 public enum Role {
-    SUPER_ADMIN,
+    SUPERADMIN,
     CLUB_ADMIN,
     STUDENT,
     GUEST

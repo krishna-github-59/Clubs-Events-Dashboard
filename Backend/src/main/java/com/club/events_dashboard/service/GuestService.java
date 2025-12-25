@@ -49,7 +49,7 @@ public class GuestService {
     // UPDATE GUEST
     public ResponseEntity<ApiResponse> updateGuest(Long id,Role requesterRole, GuestDTO guestDTO) {
         // Only allow superadmin
-        if (requesterRole != Role.SUPER_ADMIN) {
+        if (requesterRole != Role.SUPERADMIN) {
                 return ResponseEntity.status(403)
                         .body(new ApiResponse(false, "Only superadmin can update guests"));
         }
