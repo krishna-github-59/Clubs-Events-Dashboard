@@ -52,7 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (jwtUtil.validateToken(token, username)) {
 
                 List<SimpleGrantedAuthority> authorities =
-                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role));
+                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role.name()));
 
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(username, null, authorities);
