@@ -1,9 +1,8 @@
 const CATEGORY_CLUB_MAP = {
-  Technical: "Technical Club",
-  Music: "Music Club",
-  Photography: "Photography Club",
-  Sports: "Sports Club",
-  Drama: "Manchathantra Club"
+  Technical: "ByteForge",
+  ArtsAndCulture: "ArtVerse",
+  Photography: "The Viewfinder",
+  Sports: "Champions Circle",
 };
 
 export const CLUB_CATEGORY_MAP = Object.entries(CATEGORY_CLUB_MAP).reduce(

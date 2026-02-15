@@ -1,211 +1,167 @@
-.dashboard-container {
-  min-height: 100vh;
-  background-color: #ffffff;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-}
+/* ==============================
+   OVERLAY
+   ============================== */
 
-.dashboard-header {
-  background-color: #ffffff;
-  border-bottom: 1px solid #e5e5e5;
-  padding: 24px 32px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.header-content {
+.event-details-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+/* ==============================
+   MODAL CONTAINER
+   ============================== */
+
+.event-details-container {
+  width: 100%;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(30px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+  color: white;
+  position: relative;
+}
+
+/* ==============================
+   CLOSE BUTTON
+   ============================== */
+
+.close-button {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 24px;
+  border: none;
+  background: transparent;
+  color: white;
+  cursor: pointer;
+}
+
+/* ==============================
+   BANNER
+   ============================== */
+
+.event-details-banner img {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+}
+
+/* ==============================
+   CONTENT
+   ============================== */
+
+.event-details-content {
+  padding: 30px;
+}
+
+.event-details-title {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+}
+
+.event-details-meta {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
   margin-bottom: 20px;
 }
 
-.header-title-section {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.event-org {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 6px 14px;
+  border-radius: 16px;
 }
 
-.calendar-icon {
-  font-size: 32px;
+.event-category-tag {
+  background: linear-gradient(90deg, #6366f1, #a855f7);
+  padding: 6px 14px;
+  border-radius: 16px;
 }
 
-.dashboard-title {
-  margin: 0;
-  font-size: 28px;
-  font-weight: 600;
-  color: #000000;
-}
+/* ==============================
+   EDIT INPUTS
+   ============================== */
 
-.dashboard-subtitle {
-  margin: 4px 0 0 0;
-  font-size: 14px;
-  color: #666666;
-}
-
-.header-stats {
-  display: flex;
-  gap: 24px;
-}
-
-.stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
-.stat-label {
-  font-size: 12px;
-  color: #666666;
-  margin-bottom: 4px;
-}
-
-.stat-value {
-  font-size: 20px;
-  font-weight: 600;
-  color: #000000;
-}
-
-.search-container {
+.edit-input {
   width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  margin-bottom: 15px;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
 }
 
-.search-input {
-  width: 100%;
-  padding: 12px 16px;
-  border: 1px solid #e5e5e5;
-  border-radius: 8px;
-  font-size: 14px;
-  outline: none;
-  background-color: #ffffff;
+.edit-input.title {
+  font-size: 1.5rem;
+  font-weight: 600;
 }
 
-.search-input:focus {
-  border-color: #000000;
-}
+/* ==============================
+   ACTION BUTTONS
+   ============================== */
 
-.dashboard-content {
-  display: flex;
-  gap: 24px;
-  padding: 32px;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-.filters-sidebar {
-  width: 280px;
-  flex-shrink: 0;
-  border-right: 1px solid #e5e5e5;
-  padding-right: 24px;
-  position: sticky;
-  top: 210px;
-  align-self: flex-start;
-  height: fit-content;
-}
-
-.filters-header {
+.event-details-actions {
+  margin-top: 25px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
+  gap: 15px;
 }
 
-.filters-header h2 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #000000;
-}
-
-.filter-badge {
-  background-color: #f5f5f5;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 12px;
-  color: #666666;
-}
-
-.filter-section {
-  margin-bottom: 32px;
-}
-
-.filter-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: #000000;
-  margin-bottom: 12px;
-}
-
-.filter-options {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.filter-option {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  padding: 4px 0;
-}
-
-.filter-option input[type="radio"] {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-  accent-color: #000000;
-}
-
-.filter-label {
-  font-size: 14px;
-  color: #333333;
-  cursor: pointer;
-}
-
-.events-grid {
+.event-details-actions button {
   flex: 1;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-  gap: 24px;
+  padding: 12px;
+  border-radius: 14px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
 }
 
-.loading,
-.no-events {
-  grid-column: 1 / -1;
-  text-align: center;
-  padding: 48px;
-  color: #666666;
-  font-size: 16px;
+.btn-share {
+  background: rgba(255, 255, 255, 0.25);
+  color: white;
 }
 
-@media (max-width: 1024px) {
-  .dashboard-content {
-    flex-direction: column;
-  }
-
-  .filters-sidebar {
-    width: 100%;
-  }
-
-  .events-grid {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  }
+.btn-share:hover {
+  background: rgba(255, 255, 255, 0.4);
 }
 
-@media (max-width: 768px) {
-  .header-content {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-  }
+.event-details-actions button:not(.btn-share) {
+  background: linear-gradient(90deg, #f59e0b, #ef4444);
+  color: white;
+}
 
-  .header-stats {
-    width: 100%;
-    justify-content: space-between;
-  }
+.event-details-actions button:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
 
-  .events-grid {
-    grid-template-columns: 1fr;
-  }
+.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* ==============================
+   SCROLLBAR
+   ============================== */
+
+.event-details-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.event-details-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
 }

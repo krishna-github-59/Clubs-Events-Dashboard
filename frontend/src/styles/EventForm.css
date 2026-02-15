@@ -1,0 +1,87 @@
+.event-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 20px;
+}
+
+/* Common input styles */
+.event-form input,
+.event-form textarea {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #dcdcdc;
+  outline: none;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+/* Textarea */
+.event-form textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+/* Time row */
+.time-row {
+  display: flex;
+  gap: 12px;
+}
+
+.time-row input {
+  flex: 1;
+}
+
+/* Focus (edit mode only) */
+.event-form input:focus,
+.event-form textarea:focus {
+  border-color: #4f46e5; /* indigo */
+}
+
+/* View mode (disabled inputs) */
+.event-form input:disabled,
+.event-form textarea:disabled {
+  background-color: #f8f9fb;
+  color: #555;
+  border: 1px solid #e3e3e3;
+  cursor: not-allowed;
+}
+
+/* Entry fee smaller width on large screens */
+.event-form input[type="number"] {
+  max-width: 180px;
+}
+
+/* Poster upload */
+.event-form input[type="file"] {
+  border: none;
+  padding: 0;
+  font-size: 13px;
+}
+
+/* Poster preview */
+.poster-preview-img {
+  margin-top: 10px;
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+/* Smooth transitions */
+.event-form input,
+.event-form textarea {
+  transition: all 0.2s ease;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 600px) {
+  .time-row {
+    flex-direction: column;
+  }
+
+  .event-form input[type="number"] {
+    max-width: 100%;
+  }
+}

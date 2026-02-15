@@ -1,20 +1,29 @@
+/* ==============================
+   EVENT CARD - GLASS THEME
+   ============================== */
+
 .event-card {
-  background-color: #ffffff;
-  border: 1px solid #e5e5e5;
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
   overflow: hidden;
-  transition: box-shadow 0.2s ease;
-  cursor: pointer;
+  color: white;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
 }
 
 .event-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
+
+/* ==============================
+   IMAGE SECTION
+   ============================== */
 
 .event-card-image-container {
   position: relative;
-  width: 100%;
-  height: 250px;
+  height: 220px;
   overflow: hidden;
 }
 
@@ -22,102 +31,146 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.4s ease;
 }
+
+.event-card:hover .event-card-image {
+  transform: scale(1.05);
+}
+
+/* ==============================
+   BADGES
+   ============================== */
 
 .event-badge {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  padding: 6px 12px;
-  border-radius: 16px;
-  font-size: 12px;
+  top: 15px;
+  left: 15px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.8rem;
   font-weight: 600;
-  text-transform: uppercase;
+  backdrop-filter: blur(10px);
 }
 
 .event-badge.free {
-  background-color: rgba(0, 0, 0, 0.7);
-  color: #ffffff;
+  background: linear-gradient(90deg, #10b981, #34d399);
 }
 
 .event-badge.paid {
-  background-color: rgba(0, 0, 0, 0.7);
-  color: #ffffff;
+  background: linear-gradient(90deg, #f59e0b, #ef4444);
 }
+
+/* ==============================
+   ADMIN ICONS
+   ============================== */
+
+.event-admin-actions {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  display: flex;
+  gap: 10px;
+}
+
+.event-admin-icon {
+  background: rgba(0, 0, 0, 0.4);
+  padding: 6px 8px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.event-admin-icon:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+/* ==============================
+   CONTENT
+   ============================== */
 
 .event-card-content {
   padding: 20px;
 }
 
 .event-card-title {
-  margin: 0 0 12px 0;
-  font-size: 20px;
+  font-size: 1.3rem;
+  margin-bottom: 8px;
   font-weight: 600;
-  color: #000000;
-  line-height: 1.4;
 }
 
 .event-card-meta {
   display: flex;
-  gap: 12px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  opacity: 0.85;
+  margin-bottom: 15px;
 }
 
 .event-category {
-  background-color: #f5f5f5;
-  padding: 4px 12px;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 4px 10px;
   border-radius: 12px;
-  font-size: 12px;
-  color: #666666;
-}
-
-.event-club {
-  font-size: 14px;
-  color: #666666;
 }
 
 .event-card-details {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-bottom: 20px;
+  font-size: 0.9rem;
+  margin-bottom: 15px;
 }
 
 .event-detail-item {
   display: flex;
   gap: 8px;
   align-items: center;
-  font-size: 14px;
 }
 
 .event-detail-icon {
-  font-size: 16px;
+  opacity: 0.8;
 }
 
-.event-detail-value {
-  color: #666666;
-}
+/* ==============================
+   ACTION BUTTONS
+   ============================== */
 
 .event-card-actions {
   display: flex;
-  gap: 12px;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .btn-view-details {
   flex: 1;
-  padding: 12px 24px;
-  background-color: #ffffff;
-  color: #000000;
-  border: 1px solid #000000;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
+  padding: 10px;
+  border-radius: 12px;
+  border: none;
   cursor: pointer;
-  transition: all 0.2s ease;
+  font-weight: 600;
+  background: linear-gradient(90deg, #6366f1, #a855f7);
+  color: white;
+  transition: 0.3s;
 }
 
 .btn-view-details:hover {
-  background-color: #000000;
-  color: #ffffff;
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 0.8rem;
+  transition: 0.3s;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.35);
 }

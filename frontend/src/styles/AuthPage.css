@@ -1,0 +1,108 @@
+.auth-container {
+  min-height: 100vh;
+  position: relative;
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+.auth-container input,
+.auth-container select {
+  height: 36px;          /* reduce from ~44–48px */
+  padding: 6px 10px;
+  font-size: 14px;
+}
+
+.auth-container button {
+  height: 40px;
+  font-size: 14px;
+}
+
+
+.auth-background {
+  background: url("../assets/image1.png") center/cover no-repeat;
+  position: absolute;
+  inset: 0;
+}
+
+.overlay {
+    background: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0.65),
+    rgba(0, 0, 0, 0.35)
+  );
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+}
+
+.auth-content {
+  position: relative;
+  z-index: 7;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 40px 80px;
+  gap: 40px;
+}
+
+.auth-card {
+  background: #dcd7da;
+  padding: 60px 36px 20px;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.25);
+  animation: fadeInUp 0.4s ease;
+}
+
+.auth-header h2 {
+  margin-bottom: 15px;
+  font-size: 26px;
+  font-weight: 600;
+  color: #000000;
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.auth-tabs button {
+  flex: 1;
+  padding: 10px;
+  cursor: pointer;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  background: #f2f2f2;
+  transition: all 0.25s ease;
+}
+
+.auth-tabs button:hover {
+  background: #e6e6e6;
+}
+
+.auth-tabs button.active {
+  background: #007bff;
+  color: white;
+}
+
+.branding {
+  max-width: 420px;
+  color: white;
+}
+
+.branding h1 {
+  font-size: 42px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.branding p {
+  font-size: 18px;
+  opacity: 0.9;
+  line-height: 1.5;
+}
+
+

@@ -1,8 +1,8 @@
 import React from 'react';
 import '../styles/EventCard.css';
-import { getClubName } from '../utils/categoryUtils';
+import { getCategoryName } from '../utils/categoryUtils';
 
-const EventCard = ({ event, onViewDetails }) => {
+const EventCard = ({ event, onViewDetails, onEdit, onDelete, isPast=false, onAddMedia, onViewMedia }) => {
   const formatDate = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -19,16 +19,6 @@ const EventCard = ({ event, onViewDetails }) => {
     return `${displayHour}:${minutes} ${ampm}`;
   };
 
-  // const getCategoryName = (category) => {
-  //   const categoryMap = {
-  //     'TECHNICAL': 'Technical',
-  //     'MUSIC': 'Music',
-  //     'PHOTOGRAPHY': 'Photography',
-  //     'SPORTS': 'Sports',
-  //     'MANCHATHANTRA': 'Manchathantra'
-  //   };
-  //   return categoryMap[category] || category || 'General';
-  // };
 
   return (
     <div className="event-card">
@@ -38,6 +28,35 @@ const EventCard = ({ event, onViewDetails }) => {
           alt={event.name}
           className="event-card-image"
         />
+        {/* 🔥 Admin actions */}
+        {!isPast && (event.canEdit || event.canDelete) && (
+          <div className="event-admin-actions">
+            {event.canEdit && (
+              <span
+                className="event-admin-icon edit"
+                title="Edit Event"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit(event.id);
+                }}
+              >
+                ✏️
+              </span>
+            )}
+            {event.canDelete && (
+              <span
+                className="event-admin-icon delete"
+                title="Delete Event"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(event.id);
+                }}
+              >
+                🗑
+              </span>
+            )}
+          </div>
+        )}
         {(!event.entryFee || event.entryFee === 0) ? (
           <span className="event-badge free">Free</span>
         ) : (
@@ -47,7 +66,7 @@ const EventCard = ({ event, onViewDetails }) => {
       <div className="event-card-content">
         <h3 className="event-card-title">{event.name}</h3>
         <div className="event-card-meta">
-          <span className="event-category">{getClubName(event.category) || 'General'}</span>
+          <span className="event-category">{getCategoryName(event.clubName) || 'General'}</span>
           <span className="event-club">{event.clubName || 'Club'}</span>
         </div>
         <div className="event-card-details">
@@ -73,6 +92,28 @@ const EventCard = ({ event, onViewDetails }) => {
           >
             View Details
           </button>
+          {isPast && (
+            <div>
+              {event.canAddMedia && (<button
+                className="btn-secondary"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAddMedia();
+                }}
+              >
+                Add Media
+              </button>)}
+              <button
+                className="btn-secondary"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onViewMedia();
+                }}
+              >
+                View Media
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

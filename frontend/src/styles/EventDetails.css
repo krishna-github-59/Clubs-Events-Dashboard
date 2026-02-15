@@ -212,3 +212,105 @@
     width: 100%;
   }
 }
+
+
+/* ---------- Edit Mode Inputs ---------- */
+
+.edit-input,
+.event-details-content input,
+.event-details-content textarea {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #dcdcdc;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background-color: #ffffff;
+}
+
+.edit-input.title {
+  font-size: 26px;
+  font-weight: 600;
+}
+
+.event-details-content input:focus,
+.event-details-content textarea:focus {
+  border-color: #000000;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08);
+}
+
+.event-details-content textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+
+/* ---------- Time Inputs ---------- */
+
+.time-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.time-inputs input {
+  width: 120px;
+}
+
+/* ---------- Edit Note ---------- */
+
+.edit-note {
+  font-size: 13px;
+  color: #999999;
+  font-style: italic;
+}
+
+/* ---------- Primary Action Button ---------- */
+
+.event-details-actions button:not(.btn-share) {
+  flex: 1;
+  padding: 12px 24px;
+  background-color: #000000;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.event-details-actions button:not(.btn-share):hover {
+  background-color: #333333;
+}
+
+/* ---------- Numeric Input ---------- */
+
+.event-details-content input[type="number"] {
+  max-width: 140px;
+}
+
+/* ---------- Subtle Visual Polish ---------- */
+
+.event-details-info .info-item span {
+  line-height: 1.4;
+}
+
+.event-details-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.event-details-container::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+button:disabled,
+button.disabled {
+  opacity: 0.5;          /* Makes it look faded */
+  cursor: not-allowed;    /* Shows “not allowed” cursor */
+  pointer-events: none;   /* Prevents clicks even if JS bypasses */
+  background-color: #ccc; /* Optional: gray background */
+  color: #666;            /* Optional: darker text for contrast */
+}
