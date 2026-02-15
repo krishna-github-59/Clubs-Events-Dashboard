@@ -1,18 +1,23 @@
 package com.club.events_dashboard.service;
 
-import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
+import com.club.events_dashboard.constants.Role;
 import com.club.events_dashboard.dto.ApiResponse;
 import com.club.events_dashboard.dto.EventRequestDTO;
 import com.club.events_dashboard.dto.EventResponseDTO;
 import com.club.events_dashboard.entity.Club;
 import com.club.events_dashboard.entity.Event;
+import com.club.events_dashboard.entity.EventRegistration;
 import com.club.events_dashboard.entity.Media;
-import com.club.events_dashboard.entity.Role;
+import com.club.events_dashboard.entity.User;
 import com.club.events_dashboard.repository.ClubRepository;
+import com.club.events_dashboard.repository.EventRegistrationRepository;
 import com.club.events_dashboard.repository.EventRepository;
 import com.club.events_dashboard.repository.MediaRepository;
+import com.club.events_dashboard.repository.UserRepository;
 import com.club.events_dashboard.specification.EventSpecification;
+
+import jakarta.transaction.Transactional;
+
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,19 +41,43 @@ public class EventService {
     private ClubRepository clubRepository;
 
     @Autowired
-    private FileService fileService;
-
-    @Autowired
     private MediaRepository mediaRepository;
 
     @Autowired
-    private Cloudinary cloudinary;
+    private UserRepository userRepository;
 
-    // Helper — check if requested user can manage this event
+    @Autowired
+    private EventRegistrationRepository eventRegistrationRepository;
+
+    @Autowired
+    private CloudinaryService cloudinaryService;
+
+
     private boolean canManageEvent(Club club, String requesterEmail, Role requesterRole) {
-        return (requesterRole == Role.SUPER_ADMIN)
-                || (club != null && club.getAdminEmail().equalsIgnoreCase(requesterEmail));
+        if (requesterRole == Role.SUPER_ADMIN) return true;
+
+        if (requesterRole != Role.CLUB_ADMIN) return false;
+
+        User user = userRepository.findByEmail(requesterEmail)
+                .orElse(null);
+
+        if (user == null || user.getClub() == null) return false;
+
+        return user.getClub().getId().equals(club.getId());
     }
+
+    //helper function
+    private void applyPermissions(EventResponseDTO dto, Event event, Role role) {
+        LocalDate today = LocalDate.now();
+        boolean isUpcoming = event.getDate().isAfter(today);
+        boolean isClubAdmin = role == Role.CLUB_ADMIN;
+
+        dto.setCanEdit(isClubAdmin && isUpcoming);
+        dto.setCanDelete(isClubAdmin && isUpcoming);
+        dto.setCanAddMedia(isClubAdmin && !isUpcoming);
+        dto.setCanViewMedia(!isUpcoming);
+    }
+
 
     // Create event
     public ResponseEntity<ApiResponse> createEvent(
@@ -69,15 +99,23 @@ public class EventService {
 
         // 3. Upload Poster Image (optional)
         String imageUrl = null;
+        String imagePublicId = null;
 
         if (poster != null && !poster.isEmpty()) {
             try {
-                imageUrl = fileService.uploadFile(poster); // returns "/uploads/file.jpg"
+                var uploadResult = cloudinaryService.uploadFile(
+                        poster,
+                        "event_posters/" + club.getName().replaceAll("\\s+", "_")
+
+                );
+                imageUrl = uploadResult.getUrl();
+                imagePublicId = uploadResult.getPublicId();
             } catch (Exception e) {
                 return ResponseEntity.status(500)
-                        .body(new ApiResponse(false, "Image upload failed: " + e.getMessage()));
+                        .body(new ApiResponse(false, "Poster upload failed"));
             }
         }
+
 
         // 4. Create Event object with new fields
         Event event = new Event();
@@ -90,6 +128,8 @@ public class EventService {
         event.setStartTime(request.getStartTime());
         event.setEndTime(request.getEndTime());
         event.setImageUrl(imageUrl);
+        event.setImagePublicId(imagePublicId);
+
 
         // 5. Save Event
         Event savedEvent = eventRepository.save(event);
@@ -111,7 +151,6 @@ public class EventService {
 
         return ResponseEntity.ok(new ApiResponse(true, "Event created successfully", responseDTO));
     }
-
 
     // Update event
     public ResponseEntity<ApiResponse> updateEvent(
@@ -137,28 +176,30 @@ public class EventService {
                     existingEvent.setStartTime(request.getStartTime());
                     existingEvent.setEndTime(request.getEndTime());
 
-                    // If a new poster is provided, upload it and delete the old one
-                     // If a new poster is provided, upload it and delete the old one
                     if (poster != null && !poster.isEmpty()) {
                         try {
-                            // upload new
-                            String newUrl = fileService.uploadFile(poster);
+                            // upload new poster
+                            var uploadResult = cloudinaryService.uploadFile(
+                                    poster,
+                                    "event_posters/" + club.getName().replaceAll("\\s+", "_")
+                            );
 
-                            // attempt to delete old poster (if present and not equal)
-                            String oldUrl = existingEvent.getImageUrl();
-                            if (oldUrl != null && !oldUrl.trim().isEmpty() && !oldUrl.equals(newUrl)) {
+                            // delete old poster
+                            if (existingEvent.getImagePublicId() != null) {
                                 try {
-                                    fileService.deleteFile(oldUrl);
-                                } catch (Exception ex) {
-                                    // Log and continue; deleting old poster failing should not block update
-                                    // (Replace with your logger if available)
-                                    System.err.println("Failed to delete old poster: " + ex.getMessage());
+                                    cloudinaryService.deleteFile(existingEvent.getImagePublicId());
+                                } catch (Exception e) {
+                                    return ResponseEntity.status(500)
+                                    .body(new ApiResponse(false, "Failed to delete old poster"));
                                 }
                             }
 
-                            existingEvent.setImageUrl(newUrl);
+                            existingEvent.setImageUrl(uploadResult.getUrl());
+                            existingEvent.setImagePublicId(uploadResult.getPublicId());
+
                         } catch (Exception e) {
-                            return ResponseEntity.status(500).body(new ApiResponse(false, "Image upload failed: " + e.getMessage()));
+                            return ResponseEntity.status(500)
+                                    .body(new ApiResponse(false, "Poster update failed"));
                         }
                     }
 
@@ -182,51 +223,60 @@ public class EventService {
                 })
                 .orElseGet(() -> ResponseEntity.status(404).body(new ApiResponse(false, "Event not found")));
     }
+    
     // Delete event
+    @Transactional
     public ResponseEntity<ApiResponse> deleteEvent(Long id, String requesterEmail, Role requesterRole) {
         return eventRepository.findById(id)
                 .map(existingEvent -> {
                     Club club = existingEvent.getClub();
 
+                    if (club == null) {
+                        return ResponseEntity.status(400)
+                                .body(new ApiResponse(false, "Event does not have a valid club"));
+                    }
+
                     if (!canManageEvent(club, requesterEmail, requesterRole)) {
                         return ResponseEntity.status(403).body(new ApiResponse(false, "Access Denied"));
                     }
 
-                    String posterUrl = existingEvent.getImageUrl();
+                    // String posterUrl = existingEvent.getImageUrl();
 
                     // Attempt to delete poster file (do not fail the whole operation if deletion fails)
-                    if (posterUrl != null && !posterUrl.trim().isEmpty()) {
+                    // delete poster
+                    if (existingEvent.getImagePublicId() != null && !existingEvent.getImagePublicId().isEmpty()) {
                         try {
-                            fileService.deleteFile(posterUrl);
-                        } catch (Exception ex) {
-                            // log and continue
-                            System.err.println("Failed to delete poster during event deletion: " + ex.getMessage());
-                        }
+                            cloudinaryService.deleteFile(existingEvent.getImagePublicId());
+                        } catch (Exception ignored) {}
                     }
 
-                    try {
-                        // 1. Fetch all media for event
-                        List<Media> mediaList = mediaRepository.findByEventId(existingEvent.getId());
 
-                        // 2. Delete from Cloudinary
-                        for (Media m : mediaList) {
+                    // 1. Fetch all media for event
+                    List<Media> mediaList = mediaRepository.findByEventId(existingEvent.getId());
+                    if (mediaList == null) mediaList = new ArrayList<>();
+
+                    // 2. Delete from Cloudinary
+                    for (Media m : mediaList) {
+                        if (m.getPublicId() != null && !m.getPublicId().isEmpty()) {
                             try {
-                                cloudinary.uploader().destroy(m.getPublicId(), ObjectUtils.emptyMap());
-                            } catch (Exception ignored) {
-                                // continue deleting everything else
-                            }
+                                cloudinaryService.deleteFile(m.getPublicId());
+                            } catch (Exception ignored) {}
                         }
-
-                        // 3. Delete from DB
-                        mediaRepository.deleteAll(mediaList);
-
-                        // 4. Delete Event
-                        eventRepository.delete(existingEvent);
-
-                    } catch (Exception e) {
-                        return ResponseEntity.status(500)
-                                .body(new ApiResponse(false, "Error deleting event media: " + e.getMessage()));
                     }
+
+                    // 3. Delete from DB
+                    if (!mediaList.isEmpty()) {
+                        mediaRepository.deleteAll(mediaList);
+                    }
+
+                    List<EventRegistration> registrations = eventRegistrationRepository.findByEventId(existingEvent.getId());
+                    if (!registrations.isEmpty()) {
+                        eventRegistrationRepository.deleteAll(registrations);
+                    }
+                    // 4. Delete Event
+                    eventRepository.delete(existingEvent);
+
+                    
 
                     return ResponseEntity.ok(new ApiResponse(true, "Event deleted successfully"));
                 })
@@ -236,8 +286,10 @@ public class EventService {
 
     // Get all events (public)
     public ResponseEntity<ApiResponse> getAllEvents() {
-        List<EventResponseDTO> eventResponseDTOs = eventRepository.findAll().stream()
-                .map(e -> new EventResponseDTO(
+        List<EventResponseDTO> eventResponseDTOs = eventRepository.findAll()
+                .stream()
+                .map(e -> {
+                    EventResponseDTO dto = new EventResponseDTO(
                         e.getId(),
                         e.getName(),
                         e.getDescription(),
@@ -245,9 +297,19 @@ public class EventService {
                         e.getVenue(),
                         e.getClub().getId(),
                         e.getClub().getName(),
-                        e.getEntryFee()
-                    ))
-                .collect(Collectors.toList());
+                        e.getEntryFee(),
+                        e.getImageUrl(),
+                        e.getStartTime(),
+                        e.getEndTime()
+                    );
+                    dto.setCanEdit(false);
+                    dto.setCanDelete(false);
+                    dto.setCanAddMedia(false);
+                    dto.setCanViewMedia(true);
+
+                    return dto;
+                })
+                .toList();
 
         return ResponseEntity.ok(new ApiResponse(true, "All events fetched successfully", eventResponseDTOs));
     }
@@ -263,13 +325,100 @@ public class EventService {
                             e.getVenue(),
                             e.getClub().getId(),
                             e.getClub().getName(),
-                            e.getEntryFee()
+                            e.getEntryFee(),
+                            e.getImageUrl(),
+                            e.getStartTime(),
+                            e.getEndTime()
                     );
+                    eventResponseDTO.setCanEdit(false);
+                    eventResponseDTO.setCanDelete(false);
                     return ResponseEntity.ok(new ApiResponse(true, "Event fetched successfully", eventResponseDTO));
                 })
                 .orElseGet(() ->ResponseEntity.status(404).body(new ApiResponse(false, "Event not found", null)));
     }
 
+    public ResponseEntity<ApiResponse> getMyClubEvents(
+            String email, Role role) {
+
+        if (role != Role.CLUB_ADMIN) {
+            return ResponseEntity.status(403)
+                    .body(new ApiResponse(false, "Access denied"));
+        }
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Club club = user.getClub();
+
+        // Security check - club must exist
+        if (club==null) {
+            return ResponseEntity.status(403)
+                    .body(new ApiResponse(false, "Club mismatch"));
+        }
+
+        List<EventResponseDTO> eventResponseDTOs = eventRepository
+        .findByClubId(club.getId())
+        .stream()
+        .map(e -> {
+            EventResponseDTO dto = new EventResponseDTO(
+                    e.getId(),
+                    e.getName(),
+                    e.getDescription(),
+                    e.getDate(),
+                    e.getVenue(),
+                    club.getId(),
+                    club.getName(),
+                    e.getEntryFee(),
+                    e.getImageUrl(),
+                    e.getStartTime(),
+                    e.getEndTime()
+            );
+
+            dto.setCanEdit(true);
+            dto.setCanDelete(true);
+
+            return dto;
+        })
+        .toList();
+
+        return ResponseEntity.ok(
+                new ApiResponse(true, "Events fetched successfully for club admin", eventResponseDTOs)
+        );
+
+    }
+
+    public ResponseEntity<ApiResponse> getEventsByClubId(Long clubId) {
+        Club club = clubRepository.findById(clubId)
+                .orElseThrow(() -> new RuntimeException("Club not found"));
+
+        List<EventResponseDTO> eventResponseDTOs = eventRepository
+                .findByClubId(clubId)
+                .stream()
+                .map(e -> {
+                    EventResponseDTO dto = new EventResponseDTO(
+                            e.getId(),
+                            e.getName(),
+                            e.getDescription(),
+                            e.getDate(),
+                            e.getVenue(),
+                            club.getId(),
+                            club.getName(),
+                            e.getEntryFee(),
+                            e.getImageUrl(),
+                            e.getStartTime(),
+                            e.getEndTime()
+                    );
+
+                    dto.setCanEdit(true);
+                    dto.setCanDelete(true);
+
+                    return dto;
+                })
+                .toList();
+
+        return ResponseEntity.ok(
+                new ApiResponse(true, "Events fetched successfully", eventResponseDTOs)
+        );
+    }
 
     // filter events (public)
     public ResponseEntity<ApiResponse> getFilteredEvents(Long clubId, String name, LocalDate startDate, LocalDate endDate) {
@@ -291,8 +440,10 @@ public class EventService {
     // -------- Upcoming events (date >= today) ----------
     public ResponseEntity<ApiResponse> getUpcomingEvents() {
         LocalDate today = LocalDate.now();
-        List<EventResponseDTO> upcoming = eventRepository.findAllByDateGreaterThanEqualOrderByDateAsc(today).stream()
-                .map(e -> new EventResponseDTO(
+        List<EventResponseDTO> upcoming = eventRepository.findAllByDateGreaterThanEqualOrderByDateAsc(today)
+                .stream()
+                .map(e -> {
+                    EventResponseDTO dto = new EventResponseDTO(
                         e.getId(),
                         e.getName(),
                         e.getDescription(),
@@ -300,9 +451,19 @@ public class EventService {
                         e.getVenue(),
                         e.getClub().getId(),
                         e.getClub().getName(),
-                        e.getEntryFee()
-                    ))
-                .collect(Collectors.toList());
+                        e.getEntryFee(),
+                        e.getImageUrl(),
+                        e.getStartTime(),
+                        e.getEndTime()
+                    );
+                    dto.setCanEdit(false);
+                    dto.setCanDelete(false);
+                    dto.setCanAddMedia(false);
+                    dto.setCanViewMedia(false);
+
+                    return dto;
+                })
+                .toList();
 
         return ResponseEntity.ok(new ApiResponse(true, "Upcoming events fetched", upcoming));
     }
@@ -310,8 +471,10 @@ public class EventService {
     // -------- Past events (date < today) ----------
     public ResponseEntity<ApiResponse> getPastEvents() {
         LocalDate today = LocalDate.now();
-        List<EventResponseDTO> past = eventRepository.findAllByDateBeforeOrderByDateDesc(today).stream()
-                .map(e -> new EventResponseDTO(
+        List<EventResponseDTO> past = eventRepository.findAllByDateBeforeOrderByDateDesc(today)
+                .stream()
+                .map(e -> {
+                    EventResponseDTO dto = new EventResponseDTO(
                         e.getId(),
                         e.getName(),
                         e.getDescription(),
@@ -319,9 +482,19 @@ public class EventService {
                         e.getVenue(),
                         e.getClub().getId(),
                         e.getClub().getName(),
-                        e.getEntryFee()
-                    ))
-                .collect(Collectors.toList());
+                        e.getEntryFee(),
+                        e.getImageUrl(),
+                        e.getStartTime(),
+                        e.getEndTime()
+                    );
+                    dto.setCanEdit(false);
+                    dto.setCanDelete(false);
+                    dto.setCanAddMedia(false);
+                    dto.setCanViewMedia(true);
+
+                    return dto;
+                })
+                .toList();
 
         return ResponseEntity.ok(new ApiResponse(true, "Past events fetched", past));
     }
@@ -344,13 +517,16 @@ public class EventService {
         return ResponseEntity.ok(new ApiResponse(true, "Dashboard events fetched successfully", result));
     }
 
-    public ResponseEntity<ApiResponse> getUpcomingEventsByClub(Long clubId) {
+    public ResponseEntity<ApiResponse> getUpcomingEventsByClub(String email, Role role) {
         LocalDate today = LocalDate.now();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        Long clubId = user.getClub().getId();
 
         List<EventResponseDTO> events = eventRepository
                 .findByClubIdAndDateAfterOrderByDateAsc(clubId, today)
                 .stream()
-                .map(e -> new EventResponseDTO(
+                .map(e -> {
+                    EventResponseDTO dto = new EventResponseDTO(
                         e.getId(),
                         e.getName(),
                         e.getDescription(),
@@ -358,20 +534,33 @@ public class EventService {
                         e.getVenue(),
                         e.getClub().getId(),
                         e.getClub().getName(),
-                        e.getEntryFee()
-                    ))
+                        e.getEntryFee(),
+                        e.getImageUrl(),
+                        e.getStartTime(),
+                        e.getEndTime()
+                    );
+                    dto.setCanEdit(true);
+                    dto.setCanDelete(true);
+                    dto.setCanAddMedia(false);
+                    dto.setCanViewMedia(true);
+
+                    return dto;
+                })
                 .toList();
 
         return ResponseEntity.ok(new ApiResponse(true, "Upcoming events fetched", events));
     }
 
-    public ResponseEntity<ApiResponse> getPastEventsByClub(Long clubId) {
+    public ResponseEntity<ApiResponse> getPastEventsByClub(String email, Role role) {
         LocalDate today = LocalDate.now();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        Long clubId = user.getClub().getId();
 
         List<EventResponseDTO> events = eventRepository
                 .findByClubIdAndDateBeforeOrderByDateDesc(clubId, today)
                 .stream()
-                .map(e -> new EventResponseDTO(
+                .map(e -> {
+                    EventResponseDTO dto = new EventResponseDTO(
                         e.getId(),
                         e.getName(),
                         e.getDescription(),
@@ -379,8 +568,18 @@ public class EventService {
                         e.getVenue(),
                         e.getClub().getId(),
                         e.getClub().getName(),
-                        e.getEntryFee()
-                    ))
+                        e.getEntryFee(),
+                        e.getImageUrl(),
+                        e.getStartTime(),
+                        e.getEndTime()
+                    );
+                    dto.setCanEdit(false);
+                    dto.setCanDelete(false);
+                    dto.setCanAddMedia(true);
+                    dto.setCanViewMedia(true);
+
+                    return dto;
+                })
                 .toList();
 
         return ResponseEntity.ok(new ApiResponse(true, "Past events fetched", events));

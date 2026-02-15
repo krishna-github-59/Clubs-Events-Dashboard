@@ -1,4 +1,4 @@
-package com.club.events_dashboard.entity;
+package com.club.events_dashboard.constants;
 
 public enum PaymentStatus {
     PENDING,

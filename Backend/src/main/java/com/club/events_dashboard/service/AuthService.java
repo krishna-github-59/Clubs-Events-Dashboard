@@ -1,11 +1,11 @@
 package com.club.events_dashboard.service;
 
+import com.club.events_dashboard.constants.Role;
 import com.club.events_dashboard.dto.ApiResponse;
 import com.club.events_dashboard.dto.JwtResponseDTO;
 import com.club.events_dashboard.dto.LoginRequestDTO;
 import com.club.events_dashboard.dto.RegisterRequestDTO;
 import com.club.events_dashboard.dto.UserDTO;
-import com.club.events_dashboard.entity.Role;
 import com.club.events_dashboard.entity.User;
 import com.club.events_dashboard.repository.UserRepository;
 import com.club.events_dashboard.security.JwtUtil;

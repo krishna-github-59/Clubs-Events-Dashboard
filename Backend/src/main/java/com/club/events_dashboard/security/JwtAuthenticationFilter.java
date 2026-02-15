@@ -12,7 +12,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.club.events_dashboard.entity.Role;
+import com.club.events_dashboard.constants.Role;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -27,8 +27,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        return path.startsWith("/api/auth/")
-            || path.startsWith("/api/guests/")
+        return path.equals("/api/auth/login")
+            || path.equals("/api/auth/register/student")
+            // || path.startsWith("/api/guests/")
             || path.startsWith("/api/payments/");
     }
 
@@ -56,7 +57,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(username, null, authorities);
-                        System.out.println("Authorities: " + authorities);
+                        // System.out.println("Authorities: " + authorities);
 
                         
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

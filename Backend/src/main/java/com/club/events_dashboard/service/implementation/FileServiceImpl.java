@@ -1,5 +1,6 @@
 package com.club.events_dashboard.service.implementation;
 
+import com.cloudinary.Cloudinary;
 import com.club.events_dashboard.service.FileService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -9,6 +10,12 @@ import java.nio.file.*;
 
 @Service
 public class FileServiceImpl implements FileService {
+
+    private final Cloudinary cloudinary;
+
+    public FileServiceImpl(Cloudinary cloudinary) {
+        this.cloudinary = cloudinary;
+    }
 
     private final String UPLOAD_DIR = "uploads/";
 

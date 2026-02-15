@@ -6,7 +6,9 @@ import jakarta.persistence.*;
 @Entity
 @Table(
     name = "event_registrations",
-    uniqueConstraints = @UniqueConstraint(columnNames = {"event_id", "user_id", "guest_id"})
+    uniqueConstraints = @UniqueConstraint(columnNames = {"event_id", "user_id"
+    // , "guest_id"
+        })
 )
 public class EventRegistration {
 
@@ -19,12 +21,12 @@ public class EventRegistration {
     private Event event;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = true)
     private User user;     // student/admin
 
-    @ManyToOne
-    @JoinColumn(name = "guest_id")
-    private Guest guest;
+    // @ManyToOne
+    // @JoinColumn(name = "guest_id", nullable = true)
+    // private Guest guest;
 
     private Date registeredDate = new Date();
 
@@ -38,8 +40,8 @@ public class EventRegistration {
     public User getUser(){return user;}
     public void setUser(User user){this.user = user;}
 
-    public Guest getGuest(){return guest;}
-    public void setGuest(Guest guest){this.guest = guest;}
+    // public Guest getGuest(){return guest;}
+    // public void setGuest(Guest guest){this.guest = guest;}
 
     public Date getRegisteredDate(){return registeredDate;}
     public void setRegisteredDate(Date registeredDate){this.registeredDate = registeredDate;}

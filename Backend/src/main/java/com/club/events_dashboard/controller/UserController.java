@@ -41,4 +41,13 @@ public class UserController {
     public ResponseEntity<ApiResponse> getUserById(@PathVariable Long id) {
         return userService.getUserById(id);
     }
+
+    @GetMapping("/email/{email}")
+    public ResponseEntity<ApiResponse> getUserByEmail(@PathVariable String email) {
+        User user = userService.getUserByEmail(email);
+
+        return ResponseEntity.ok(
+            new ApiResponse(true, "User fetched successfully", user)
+        );
+    }
 }

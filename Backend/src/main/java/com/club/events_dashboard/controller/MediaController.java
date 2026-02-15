@@ -1,5 +1,6 @@
 package com.club.events_dashboard.controller;
 
+import com.club.events_dashboard.constants.Role;
 import com.club.events_dashboard.dto.ApiResponse;
 import com.club.events_dashboard.security.JwtUtil;
 import com.club.events_dashboard.service.MediaService;
@@ -7,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import com.club.events_dashboard.entity.Role;
 
 
 @RestController
@@ -33,19 +33,19 @@ public class MediaController {
         return mediaService.uploadMedia(file, eventId, requesterEmail, requesterRole);
     }
 
-    @DeleteMapping("delete/{eventId}")
+    @DeleteMapping("/delete/{mediaId}")
     public ResponseEntity<ApiResponse> deleteMedia(
                 @RequestHeader("Authorization") String authHeader,
-                @PathVariable Long eventId){
+                @PathVariable Long mediaId){
 
         String token = authHeader.substring(7);
         String requesterEmail = jwtUtil.extractUsername(token);
         Role requesterRole = jwtUtil.extractRole(token);
 
-        return mediaService.deleteMedia(eventId, requesterEmail, requesterRole);
+        return mediaService.deleteMedia(mediaId, requesterEmail, requesterRole);
     }
 
-    @GetMapping("/event/{eventId}")
+    @GetMapping("/get/{eventId}")
     public ResponseEntity<ApiResponse> getMediaByEvent(@PathVariable Long eventId) {
         return mediaService.getMediaByEvent(eventId);
     }

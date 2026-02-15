@@ -1,5 +1,7 @@
 package com.club.events_dashboard.security;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,16 +25,41 @@ public class SecurityConfig {
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
+    public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
+        var config = new org.springframework.web.cors.CorsConfiguration();
+
+        config.setAllowedOrigins(List.of(
+                "http://localhost:3000", 
+                "https://clubs-events-dashboard.vercel.app"
+        ));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
+
+        var source = new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+
+        return source;
+    }
+
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+            .cors(cors -> {})
             .csrf(csrf -> csrf.disable())  // Disable CSRF for API testing in Postman
             .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/api/auth/**","/api/guests/**","/api/payments/**").permitAll()
+                    .requestMatchers("/api/auth/register/student").permitAll()
+                    .requestMatchers("/api/auth/register/club-admin").hasRole("SUPER_ADMIN")
+                    .requestMatchers("/api/auth/login","/api/payments/**","/api/events/register/**").permitAll()
                     .requestMatchers(HttpMethod.GET,
                         "/api/events/**",
-                        "/api/clubs/**"
+                        "/api/media/**"
                     ).permitAll()
-                    // .hasAnyRole("SUPER_ADMIN", "CLUB_ADMIN", "STUDENT")
+                    .requestMatchers("/api/clubs/**").hasRole("SUPER_ADMIN")
+                    .requestMatchers("/api/events/delete/**", "/api/events/update/**", "/api/events/add", "/api/media/**").hasAnyRole("CLUB_ADMIN", "SUPER_ADMIN")
+                    .requestMatchers("/api/users/email/**").authenticated()
+                    .requestMatchers("/api/events/register").permitAll()
                     .anyRequest().authenticated()
             )
             .formLogin(form -> form.disable()) // Disable default login form

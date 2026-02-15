@@ -1,6 +1,6 @@
 package com.club.events_dashboard.repository;
 
-import com.club.events_dashboard.entity.Role;
+import com.club.events_dashboard.constants.Role;
 import com.club.events_dashboard.entity.User;
 
 import org.springframework.data.jpa.repository.JpaRepository;

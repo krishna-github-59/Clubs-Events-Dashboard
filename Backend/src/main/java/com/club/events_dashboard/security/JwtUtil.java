@@ -1,6 +1,6 @@
 package com.club.events_dashboard.security;
 
-import com.club.events_dashboard.entity.Role;
+import com.club.events_dashboard.constants.Role;
 import com.club.events_dashboard.entity.User;
 import com.club.events_dashboard.repository.UserRepository;
 
@@ -48,6 +48,13 @@ public class JwtUtil {
         }
         return Role.valueOf(roleString); // converts "SUPER_ADMIN" -> Role.SUPER_ADMIN
     }
+    
+    public Long extractClubId(String token) {
+    return extractClaim(token, claims -> {
+        Integer clubId = claims.get("clubId", Integer.class);
+        return clubId != null ? clubId.longValue() : null;
+    });
+}
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
@@ -69,16 +76,19 @@ public class JwtUtil {
         Map<String, Object> claims = new HashMap<>();
         if(user.getRole() != null) {
             claims.put("role", user.getRole().name()); // Role must be non-null
+            if (user.getRole() == Role.CLUB_ADMIN && user.getClub() != null) {
+                claims.put("clubId", user.getClub().getId());
+                claims.put("clubName", user.getClub().getName());
+            }
         }
-        System.out.println("email:" );
         return createToken(claims, email);
     }
 
-    public String generateTokenForGuest(String email, Role role) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("role", role.name());
-        return createToken(claims, email);
-    }
+    // public String generateTokenForGuest(String email, Role role) {
+    //     Map<String, Object> claims = new HashMap<>();
+    //     claims.put("role", role.name());
+    //     return createToken(claims, email);
+    // }
 
     private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()

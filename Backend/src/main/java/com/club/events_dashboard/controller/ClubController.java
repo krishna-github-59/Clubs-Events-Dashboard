@@ -1,8 +1,8 @@
 package com.club.events_dashboard.controller;
 
+import com.club.events_dashboard.constants.Role;
 import com.club.events_dashboard.dto.ApiResponse;
 import com.club.events_dashboard.dto.ClubRequestDTO;
-import com.club.events_dashboard.entity.Role;
 import com.club.events_dashboard.security.JwtUtil;
 import com.club.events_dashboard.service.ClubService;
 import org.springframework.beans.factory.annotation.Autowired;

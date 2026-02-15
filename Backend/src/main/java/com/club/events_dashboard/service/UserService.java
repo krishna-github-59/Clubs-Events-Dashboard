@@ -32,6 +32,11 @@ public class UserService {
                 .orElseGet(() -> ResponseEntity.status(404).body(new ApiResponse(false, "User not found")));
     }
 
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+    }
+
     public ResponseEntity<ApiResponse> createUser(User user) {
         // Encode password and save new user
         user.setPassword(passwordEncoder.encode(user.getPassword()));

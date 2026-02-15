@@ -1,11 +1,11 @@
 package com.club.events_dashboard.service;
 
+import com.club.events_dashboard.constants.Role;
 import com.club.events_dashboard.dto.ApiResponse;
 import com.club.events_dashboard.dto.ClubRequestDTO;
 import com.club.events_dashboard.dto.ClubResponseDTO;
 import com.club.events_dashboard.entity.Club;
 import com.club.events_dashboard.entity.User;
-import com.club.events_dashboard.entity.Role;
 import com.club.events_dashboard.repository.ClubRepository;
 import com.club.events_dashboard.repository.UserRepository;
 
@@ -56,9 +56,12 @@ public class ClubService {
             clubRequest.getAdminEmail()
         );
 
+        adminUser.get().setClub(club);
+
         Club savedClub = clubRepository.save(club);
 
         ClubResponseDTO responseDTO = new ClubResponseDTO(savedClub);
+        userRepository.save(adminUser.get());
         return ResponseEntity.ok(new ApiResponse(true, "Club created successfully", responseDTO));
     }
 

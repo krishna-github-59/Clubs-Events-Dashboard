@@ -7,7 +7,6 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "events")
@@ -30,8 +29,11 @@ public class Event {
     @NotBlank(message = "Venue cannot be empty")
     private String venue;
 
+    @Column(length = 500)
     private String imageUrl;
-    
+
+    private String imagePublicId;
+
     @NotNull
     private LocalTime startTime;
 
@@ -81,6 +83,10 @@ public class Event {
     public String getImageUrl() { return imageUrl; }
 
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+
+    public String getImagePublicId() { return imagePublicId; }
+
+    public void setImagePublicId(String imagePublicId) { this.imagePublicId = imagePublicId; }
 
     public LocalTime getStartTime() { return startTime; }
 

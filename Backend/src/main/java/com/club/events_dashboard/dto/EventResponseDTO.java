@@ -17,6 +17,12 @@ public class EventResponseDTO {
     private LocalTime startTime;  
     private LocalTime endTime;    
 
+    private boolean canEdit;
+    private boolean canDelete;
+
+    private boolean canAddMedia;
+    private boolean canViewMedia;
+
     public EventResponseDTO() {}
 
     public EventResponseDTO(Long id, String name, String description, LocalDate date, String venue, Long clubId, String clubName, Double entryFee) {
@@ -30,7 +36,7 @@ public class EventResponseDTO {
         this.entryFee = entryFee;
     }
 
-        public EventResponseDTO(Long id, String name, String description, LocalDate date, String venue, Long clubId, String clubName, Double entryFee, String imageUrl, LocalTime startTime, LocalTime endTime) {
+    public EventResponseDTO(Long id, String name, String description, LocalDate date, String venue, Long clubId, String clubName, Double entryFee, String imageUrl, LocalTime startTime, LocalTime endTime) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -76,4 +82,16 @@ public class EventResponseDTO {
 
     public LocalTime getEndTime() { return endTime; }
     public void setEndTime(LocalTime endTime) { this.endTime = endTime; }
+
+    public boolean getCanEdit() { return canEdit; }
+    public void setCanEdit(boolean canEdit) { this.canEdit = canEdit; }
+
+    public boolean getCanDelete() { return canDelete; }
+    public void setCanDelete(boolean canDelete) { this.canDelete = canDelete; }
+
+    public boolean getCanAddMedia() { return canAddMedia; }
+    public void setCanAddMedia(boolean canAddMedia) { this.canAddMedia = canAddMedia; }
+
+    public boolean getCanViewMedia() { return canViewMedia; }
+    public void setCanViewMedia(boolean canViewMedia) { this.canViewMedia = canViewMedia; }
 }

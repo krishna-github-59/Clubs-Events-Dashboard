@@ -1,9 +1,9 @@
 package com.club.events_dashboard.service;
 
+import com.club.events_dashboard.constants.PaymentStatus;
 import com.club.events_dashboard.dto.ApiResponse;
 import com.club.events_dashboard.entity.Event;
 import com.club.events_dashboard.entity.Payment;
-import com.club.events_dashboard.entity.PaymentStatus;
 import com.club.events_dashboard.repository.EventRepository;
 import com.club.events_dashboard.repository.PaymentRepository;
 import com.razorpay.Order;
@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -47,7 +48,7 @@ public class PaymentService {
             RazorpayClient razorpay = new RazorpayClient(keyId, keySecret);
 
             JSONObject orderRequest = new JSONObject();
-            orderRequest.put("amount", (int) (event.getEntryFee() * 100)); // amount in paise
+            orderRequest.put("amount", (int) (event.getEntryFee()*100)); 
             orderRequest.put("currency", "INR");
             orderRequest.put("payment_capture", 1);
 
@@ -61,8 +62,15 @@ public class PaymentService {
             payment.setStatus(PaymentStatus.PENDING);
 
             paymentRepository.save(payment);
+
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("id", order.get("id"));
+            responseData.put("amount", order.get("amount"));
+            responseData.put("currency", order.get("currency"));
+            responseData.put("keyId", keyId); // PUBLIC KEY ONLY
+
             return ResponseEntity.ok(
-                new ApiResponse(true, "Order created successfully", order.toString())
+                new ApiResponse(true, "Order created successfully", responseData)
             );
 
         } catch (Exception e) {
@@ -77,7 +85,7 @@ public class PaymentService {
             String orderId = paymentData.get("razorpay_order_id");
             Optional<Payment> paymentOpt = paymentRepository.findByRazorpayOrderId(orderId);
 
-            if (paymentOpt == null) {
+            if (paymentOpt.isEmpty()) {
                 return ResponseEntity.badRequest().body(new ApiResponse(false, "Payment record not found for order ID", null));
             }
 

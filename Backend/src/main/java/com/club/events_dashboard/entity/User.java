@@ -1,5 +1,7 @@
 package com.club.events_dashboard.entity;
 
+import com.club.events_dashboard.constants.Role;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
@@ -22,6 +24,9 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @ManyToOne
+    @JoinColumn(name = "club_id", nullable = true)
+    private Club club;
 
     public User() {}
 
@@ -71,4 +76,11 @@ public class User {
         this.role = role;
     }
 
+    public Club getClub(){
+        return club;
+    }
+    
+    public void setClub(Club club){
+        this.club = club;
+    }
 }

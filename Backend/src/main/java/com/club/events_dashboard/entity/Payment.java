@@ -1,6 +1,8 @@
 package com.club.events_dashboard.entity;
 import java.time.LocalDate;
 
+import com.club.events_dashboard.constants.PaymentStatus;
+
 import jakarta.persistence.*;
 
 
