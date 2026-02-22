@@ -15,6 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.config.Customizer;
 
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
@@ -24,30 +25,31 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    @Bean
-    public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
-        var config = new org.springframework.web.cors.CorsConfiguration();
+    // @Bean
+    // public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
+    //     var config = new org.springframework.web.cors.CorsConfiguration();
 
-        config.setAllowedOrigins(List.of(
-                "http://localhost:3000", 
-                "https://clubs-events-dashboard.vercel.app"
-        ));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true);
+    //     config.setAllowedOrigins(List.of(
+    //             "http://localhost:3000", 
+    //             "https://clubs-events-dashboard.vercel.app"
+    //     ));
+    //     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+    //     config.setAllowedHeaders(List.of("*"));
+    //     config.setAllowCredentials(true);
 
-        var source = new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
+    //     var source = new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
+    //     source.registerCorsConfiguration("/**", config);
 
-        return source;
-    }
+    //     return source;
+    // }
 
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             // .cors(cors -> {})
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            // .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .cors(Customizer.withDefaults())
             .csrf(csrf -> csrf.disable())  // Disable CSRF for API testing in Postman
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()

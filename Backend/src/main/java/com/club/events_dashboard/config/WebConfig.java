@@ -9,7 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer{
 
-    // // ---------- CORS ----------
+    // // ---------- GLOBAL CORS CONFIG ----------
     // // CORS
     // @Override
     // public void addCorsMappings(CorsRegistry registry) {
@@ -19,17 +19,19 @@ public class WebConfig implements WebMvcConfigurer{
     //             .allowedHeaders("*")
     //             .allowCredentials(true);
     // }
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins(
+                        "http://localhost:3000",
+                        "https://clubs-events-dashboard.vercel.app"
+                    )
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedHeaders("*")
+                .allowCredentials(true);
+            }
 
     // // ---------- Serve Uploaded Files ----------
-    // @Override
-    // public void addResourceHandlers(ResourceHandlerRegistry registry) {
-
-    //     // Maps URL:  http://localhost:8080/uploads/...  
-    //     // To Folder: uploads/  in your project root
-    //     registry.addResourceHandler("/uploads/**")
-    //             .addResourceLocations("file:uploads/");
-    // }
-
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/uploads/**")
