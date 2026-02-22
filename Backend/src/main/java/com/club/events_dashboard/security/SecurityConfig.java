@@ -49,6 +49,7 @@ public class SecurityConfig {
             .cors(cors -> {})
             .csrf(csrf -> csrf.disable())  // Disable CSRF for API testing in Postman
             .authorizeHttpRequests(auth -> auth
+                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                     .requestMatchers("/api/auth/register/student").permitAll()
                     .requestMatchers("/api/auth/register/club-admin").hasRole("SUPER_ADMIN")
                     .requestMatchers("/api/auth/login","/api/payments/**","/api/events/register/**").permitAll()
