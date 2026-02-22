@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import StudentDashboard from "./StudentDashboard";
 import SuperAdminEventsView from "./SuperAdminEventsView";
 import "../styles/dashboard.css";
-import { FiUsers, FiCalendar, FiHome, FiShield, FiLogOut } from "react-icons/fi";
+import { FiUsers, FiCalendar, FiHome, FiShield } from "react-icons/fi";
 // import { logout } from "../utils/authUtils";
 
 const SuperAdminDashboard = () => {
