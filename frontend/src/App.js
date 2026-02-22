@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import AuthPage from './components/AuthPage';
 // import EventDashboard from './components/EventDashboard';
 import ProtectedRoute from './routes/ProtectedRoute';

@@ -54,7 +54,8 @@ public class SecurityConfig {
                     .requestMatchers("/api/auth/login","/api/payments/**","/api/events/register/**").permitAll()
                     .requestMatchers(HttpMethod.GET,
                         "/api/events/**",
-                        "/api/media/**"
+                        "/api/media/**",
+                        "/api/clubs/all"
                     ).permitAll()
                     .requestMatchers("/api/clubs/**").hasRole("SUPER_ADMIN")
                     .requestMatchers("/api/events/delete/**", "/api/events/update/**", "/api/events/add", "/api/media/**").hasAnyRole("CLUB_ADMIN", "SUPER_ADMIN")

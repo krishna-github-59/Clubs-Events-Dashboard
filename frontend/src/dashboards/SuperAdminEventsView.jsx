@@ -1,8 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import EventCard from "../components/EventCard";
 import EventService from "../services/EventService";
+import EventDetails from "../components/EventDetails";
+import EventMediaModal from "../components/EventMediaModal";
+import useEventDashboard from "./useEventDashboard";
 
 const SuperAdminEventsView = () => {
+  const {
+    loadData,
+  } = useEventDashboard("CLUB_ADMIN");
+
   const [clubs, setClubs] = useState([]);
   const [selectedClub, setSelectedClub] = useState(null);
   const [events, setEvents] = useState([]);
@@ -12,26 +19,32 @@ const SuperAdminEventsView = () => {
   const [showMediaModal, setShowMediaModal] = useState(false);
   const [mediaEventId, setMediaEventId] = useState(null);
   const [canUpload, setCanUpload] = useState(false);
+  
+  const loadClubs = async () => {
+    const res = await EventService.getAllClubs();
+    console.log("get all clubs result", res);
+    if (res.success && res.data.length > 0){
+      setClubs(res.data);
+      setSelectedClub(res.data[0]);
+    }
+  };
+  
+  const loadEvents = useCallback(async () => {
+    if (!selectedClub?.id) return;
 
+    const res = await EventService.getEventsByClub(selectedClub.id);
+    if (res.success) setEvents(res.data);
+  },[selectedClub]);
+  
   useEffect(() => {
     loadClubs();
   }, []);
 
   useEffect(() => {
-    if (selectedClub) {
-      loadEvents();
-    }
-  }, [selectedClub, activeTab]);
+    loadEvents();
+  }, [loadEvents, activeTab]);
 
-  const loadClubs = async () => {
-    const res = await EventService.getAllClubs();
-    if (res.success) setClubs(res.data);
-  };
-
-  const loadEvents = async () => {
-    const res = await EventService.getEventsByClub(selectedClub.id);
-    if (res.success) setEvents(res.data);
-  };
+  console.log("events", events);
 
   const filteredEvents = events.filter(event =>
     activeTab === "UPCOMING"
@@ -39,11 +52,11 @@ const SuperAdminEventsView = () => {
       : new Date(event.date) < new Date()
   );
 
-     const handleAddMedia = (event) => {
+  const handleAddMedia = (event) => {
     setMediaEventId(event.id);
     setCanUpload(true);
     setShowMediaModal(true);
-   };
+  };
 
    const handleViewMedia = (event) => {
     setMediaEventId(event.id);
@@ -71,7 +84,7 @@ const SuperAdminEventsView = () => {
                 setSelectedClub(club);
                 }}
             >
-                <option value="">Select Club</option>
+                {/* <option value="">Select Club</option> */}
                 {clubs.map(club => (
                 <option key={club.id} value={club.id}>
                     {club.name}
@@ -121,6 +134,39 @@ const SuperAdminEventsView = () => {
           />
         ))}
       </div>
+
+      {(selectedEventId || editEventId) && (
+        <EventDetails
+          eventId={selectedEventId || editEventId}
+          viewOnly={!editEventId}
+          onClose={() => {
+            setSelectedEventId(null);
+            setEditEventId(null);
+          }}
+          onRegisterSuccess={loadData}
+        />
+      )}
+
+      {/* {showCreateEvent && (
+        <CreateEvent
+          onClose={() => setShowCreateEvent(false)}
+          onSuccess={() => {
+            setShowCreateEvent(false);
+            loadData();
+          }}
+        />
+      )} */}
+
+      {showMediaModal && (
+        <EventMediaModal
+          eventId={mediaEventId}
+          canUpload={canUpload}
+          onClose={() => {
+          setShowMediaModal(false);
+          setMediaEventId(null);
+        }}
+        />
+      )}
     </div>
   );
 };

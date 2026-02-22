@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from "react-dom";
 import EventService from '../services/EventService';
 import PaymentModal from './PaymentModal';
@@ -21,22 +21,10 @@ const EventDetails = ({ eventId, viewOnly = true, isPast = false, onClose, onReg
   const [posterPreview, setPosterPreview] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [user, setUser] = useState(null);
+  // const [user, setUser] = useState(null);
 
-  console.log("user", user);
-  console.log("get logged in user", getLoggedInUser());
 
-  useEffect(() => {
-    loadEvent();
-    const userData = getLoggedInUser();
-    if (userData && userData.id) {
-      setUser(userData);
-    } else {
-      setUser(null);
-    }
-  }, [eventId]);
-
-  const loadEvent = async () => {
+  const loadEvent = useCallback(async () => {
     try {
       setLoading(true);
       const response = await EventService.getEventById(eventId);
@@ -60,7 +48,20 @@ const EventDetails = ({ eventId, viewOnly = true, isPast = false, onClose, onReg
     } finally {
       setLoading(false);
     }
-  };
+  },[eventId]);
+
+
+  useEffect(() => {
+    loadEvent();
+
+    // const userData = getLoggedInUser();
+    // if (userData && userData.id) {
+    //   setUser(userData);
+    // } else {
+    //   setUser(null);
+    // }
+  }, [loadEvent]);
+
 
   const handleUpdate = async () => {
     if (!form.name || !form.date || !form.startTime || !form.endTime || !form.venue) {
@@ -162,20 +163,7 @@ const EventDetails = ({ eventId, viewOnly = true, isPast = false, onClose, onReg
     );
   }
 
-  // const formatDate = (dateString) => {
-  //   if (!dateString) return '';
-  //   const date = new Date(dateString);
-  //   return date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-  // };
 
-  // const formatTime = (timeString) => {
-  //   if (!timeString) return '';
-  //   const [hours, minutes] = timeString.split(':');
-  //   const hour = parseInt(hours);
-  //   const ampm = hour >= 12 ? 'PM' : 'AM';
-  //   const displayHour = hour % 12 || 12;
-  //   return `${displayHour}:${minutes} ${ampm}`;
-  // };
 
   return createPortal(
     <>

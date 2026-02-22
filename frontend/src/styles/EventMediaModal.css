@@ -28,7 +28,9 @@
   margin: 0 0 16px;
   font-size: 20px;
   font-weight: 600;
+  font:caption;
   text-align: center;
+  color: #051542;
 }
 
 /* Upload section */
@@ -99,7 +101,8 @@
   padding: 8px 20px;
   border-radius: 6px;
   cursor: pointer;
-  font-weight: 500;
+  font-weight: 700;
+  color: #030d20;
 }
 
 .btn-close:hover {

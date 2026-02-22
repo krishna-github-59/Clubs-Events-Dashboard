@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { createPortal } from "react-dom";
 import EventService from "../services/EventService";
 import "../styles/EventMediaModal.css";
@@ -7,14 +7,15 @@ const EventMediaModal = ({ eventId, canUpload, onClose }) => {
   const [media, setMedia] = useState([]);
   const [file, setFile] = useState(null);
 
-  useEffect(() => {
-    loadMedia();
-  }, [eventId]);
-
-  const loadMedia = async () => {
+  const loadMedia = useCallback(async () => {
     const res = await EventService.getEventMedia(eventId);
     if (res.success) setMedia(res.data || []);
-  };
+  },[eventId]);
+
+  useEffect(() => {
+    loadMedia();
+  }, [loadMedia]);
+
 
   const handleUpload = async () => {
     if (!file) return alert("Select a file");

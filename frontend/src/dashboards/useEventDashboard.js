@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import EventService from "../services/EventService";
 import { getCategoryName } from "../utils/categoryUtils";
-import { getLoggedInUser } from "../utils/authUtils";
+
 
 const useEventDashboard = (mode) => {
   const [upcomingEvents, setUpcomingEvents] = useState([]);
@@ -22,18 +22,10 @@ const useEventDashboard = (mode) => {
   ];
 
   useEffect(() => {
-    loadData();
-  }, []);
-
-  useEffect(() => {
-    filterEvents();
-  }, [searchQuery, selectedCategory, upcomingEvents, pastEvents]);
-
-  useEffect(() => {
     setTotalEventsCount(upcomingEvents.length + pastEvents.length);
   }, [upcomingEvents, pastEvents]);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -61,9 +53,13 @@ const useEventDashboard = (mode) => {
     } finally {
       setLoading(false);
     }
-  };
+  },[mode]);
 
-  const filterEvents = () => {
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  const filterEvents = useCallback(() => {
     let filteredUpcoming = [...upcomingEvents];
     let filteredPast = [...pastEvents];
 
@@ -88,7 +84,11 @@ const useEventDashboard = (mode) => {
 
     setFilteredUpcomingEvents(filteredUpcoming);
     setFilteredPastEvents(filteredPast);
-  };
+  },[mode, selectedCategory, searchQuery, upcomingEvents, pastEvents]);
+
+  useEffect(() => {
+    filterEvents();
+  }, [filterEvents]);
 
   return {
     loading,

@@ -26,6 +26,8 @@ const ClubAdminDashboard = () => {
   const [canUpload, setCanUpload] = useState(false);
   const [activeTab, setActiveTab] = useState("UPCOMING");
 
+  console.log("events club admin", filteredPastEvents);
+
   
   const handleLogout = () => {
     if (window.confirm("Are you sure you want to logout?")) {
@@ -116,14 +118,14 @@ const ClubAdminDashboard = () => {
             onEdit={activeTab === "UPCOMING" ? setEditEventId : undefined}
             onDelete={activeTab === "UPCOMING" ? handleDeleteEvent : undefined}
             onAddMedia={
-            activeTab === "PAST"
-                ? () => handleAddMedia(event)
-                : undefined
+              activeTab === "PAST"
+                  ? () => handleAddMedia(event)
+                  : undefined
             }
             onViewMedia={
-            activeTab === "PAST"
-                ? () => handleViewMedia(event)
-                : undefined
+              activeTab === "PAST"
+                  ? () => handleViewMedia(event)
+                  : undefined
             }
         />
         ))
